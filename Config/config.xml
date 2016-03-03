@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <loops>
+        <loop name="deliveryround" class="DeliveryRound\Loop\DeliveryRoundLoop" />
+    </loops>
+
+    <forms>
+        <form name="deliveryround_form" class="DeliveryRound\Form\DeliveryRoundForm" />
+        <form name="deliveryround_delete_form" class="DeliveryRound\Form\DeliveryRoundDeleteForm" />
+    </forms>
+
+    <hooks>
+        <hook id="deliveryround.hook" class="DeliveryRound\Hook\DeliveryRoundHook" scope="request">
+            <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfig" />
+        </hook>
+    </hooks>
+
+</config>

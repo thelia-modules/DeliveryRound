@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database defaultIdMethod="native" name="thelia"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../../../core/vendor/propel/propel/resources/xsd/database.xsd" >
+
+    <table name="delivery_round" namespace="DeliveryRound\Model">
+        <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+        <column name="zip_code" required="true" type="VARCHAR" size="20" />
+        <column name="city" required="true" type="VARCHAR" size="255" />
+        <column name="address" type="LONGVARCHAR" />
+        <column name="day" required="true" type="ENUM" valueSet="monday, tuesday, wednesday, thursday, friday, saturday, sunday" />
+        <column name="presence_time" type="LONGVARCHAR" />
+        <column name="price" type="DECIMAL" size="16" scale="6" required="true" defaultValue="0.000000"/>
+    </table>
+
+    <external-schema filename="local/config/schema.xml" referenceOnly="true" />
+</database>
