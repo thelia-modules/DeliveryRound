@@ -21,4 +21,12 @@
         </hook>
     </hooks>
 
+    <services>
+        <service id="send.deliveryround.mail" class="DeliveryRound\EventListeners\SendEMail" scope="request">
+            <argument type="service" id="thelia.parser" />
+            <argument type="service" id="mailer"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+    </services>
+
 </config>

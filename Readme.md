@@ -1,6 +1,6 @@
 # Delivery Round
 
-Handle rounds to prevent customer you will be present into a given city to dispatch orders.
+Handle rounds to inform customer you will be present into a given city to dispatch orders.
 
 ## Installation
 

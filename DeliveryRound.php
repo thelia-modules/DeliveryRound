@@ -26,6 +26,7 @@ class DeliveryRound extends AbstractDeliveryModule
 {
     /** @var string */
     const DOMAIN_NAME = 'deliveryround';
+    const STATUS_SENT = 'sent';
 
     /**
      * @param ConnectionInterface|null $con
