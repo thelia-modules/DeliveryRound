@@ -3,11 +3,11 @@
 return array(
     'Address' => 'Adresse',
     'City' => 'Ville',
-    'Configure DeliveryRound' => 'Configuration de DeliveryRound',
     'Day' => 'Jour',
-    'Presence period' => 'Heures de présence',
-    'Price' => 'Prix',
+    'Delivery period' => 'Heures de livraison',
     'Remove' => 'Supprimer',
     'Save' => 'Enregistrer',
     'ZipCode' => 'Code postal',
+    'configure delivery round price' => 'Configurer le prix des tournées de livraison',
+    'configure delivery rounds' => 'Configurer les tournées de livraison',
 );

@@ -19,45 +19,46 @@ composer require thelia/delivery-round-module:~1.0
 
 ## Usage
 
-In the module configuration page, add information about where and when you'll be dispatching orders:
-- zip code
-- city
+In the module configuration page, add information about the price of this delivery method and about where and when you'll be dispatching orders:
+- zip code *
+- city *
 - address
-- day
+- day *
 - period
-- price for choosing this delivery method
 
-You can add as much lines as you want or delete them.
+You can use the *address* input to inform your customers where you will be dispatching their orders, or leave it blank if you deliver at home.
 
-## Hook
+To display a message about your round or the time you need to prepare an order for example, use the description in the module edition.
 
-If your module use one or more hook, fill this part. Explain which hooks are used.
-
+This delivery method will be proposed to customer who have at least one address with the same zipcode as one of the ones you entered in the configuration.
 
 ## Loop
 
-If your module declare one or more loop, describe them here like this :
-
-[loop name]
+[deliveryround]
 
 ### Input arguments
 
 |Argument |Description |
 |---      |--- |
-|**arg1** | describe arg1 with an exemple. |
-|**arg2** | describe arg2 with an exemple. |
+|**id** | ID of a specific delivery round entry |
+|**zipcode** | Used to sort delivery round entries by zipcode |
+|**day** | Used to sort delivery round entries by day. Values: *monday*, *tuesday*, *wednesday*, *thursday*, *friday*, *saturday*, *sunday*.  |
 
 ### Output arguments
 
 |Variable   |Description |
 |---        |--- |
-|$VAR1    | describe $VAR1 variable |
-|$VAR2    | describe $VAR2 variable |
+|$ID    | ID of the returned delivery round entry |
+|$ZIPCODE    | Zipcode |
+|$CITY    | City |
+|$ADDRESS    | Address from where you dispatch your orders |
+|$DAY    | Day of the week |
+|$DELIVERY_PERIOD    | Period during which one you'll be dispatching orders |
 
 ### Exemple
 
-Add a complete exemple of your loop
-
-## Other ?
-
-If you have other think to put, feel free to complete your readme as you want.
+<ul>
+    {loop type='deliveryround' name='deliveryround-loop'}
+        <li>{$DAY|date_format:"%A"} : {$ZIPCODE} {$CITY}{if $ADDRESS}, {$ADDRESS}{/if}{if $DELIVERY_PERIOD}, {$DELIVERY_PERIOD}{/if}</li>
+    {/loop}
+</ul>

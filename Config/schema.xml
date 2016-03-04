@@ -9,8 +9,7 @@
         <column name="city" required="true" type="VARCHAR" size="255" />
         <column name="address" type="LONGVARCHAR" />
         <column name="day" required="true" type="ENUM" valueSet="monday, tuesday, wednesday, thursday, friday, saturday, sunday" />
-        <column name="presence_time" type="LONGVARCHAR" />
-        <column name="price" type="DECIMAL" size="16" scale="6" required="true" defaultValue="0.000000"/>
+        <column name="delivery_period" type="LONGVARCHAR" />
     </table>
 
     <external-schema filename="local/config/schema.xml" referenceOnly="true" />

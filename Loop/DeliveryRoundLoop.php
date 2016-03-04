@@ -3,10 +3,13 @@
 namespace DeliveryRound\Loop;
 
 use DeliveryRound\Model\DeliveryRoundQuery;
+use DeliveryRound\Model\Map\DeliveryRoundTableMap;
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Element\PropelSearchLoopInterface;
+use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 
 /**
@@ -23,7 +26,11 @@ class DeliveryRoundLoop extends BaseLoop implements PropelSearchLoopInterface
      */
     protected function getArgDefinitions()
     {
-        return new ArgumentCollection();
+        return new ArgumentCollection(
+            Argument::createIntListTypeArgument('id'),
+            Argument::createAnyListTypeArgument('zipcode'),
+            Argument::createEnumListTypeArgument('day', DeliveryRoundTableMap::getValueSet(DeliveryRoundTableMap::DAY))
+        );
     }
 
     /**
@@ -33,7 +40,20 @@ class DeliveryRoundLoop extends BaseLoop implements PropelSearchLoopInterface
      */
     public function buildModelCriteria()
     {
-        $search = DeliveryRoundQuery::create();
+        $search = DeliveryRoundQuery::create()->orderByDay(Criteria::ASC);
+
+        if ($this->getId() !== null) {
+            $search->filterById($this->getId(), Criteria::IN);
+        }
+
+        if ($this->getZipcode() !== null) {
+            $search->filterByZipCode($this->getZipcode(), Criteria::IN);
+        }
+
+        if ($this->getDay() !== null) {
+            $search->filterByDay($this->getDay(), Criteria::IN);
+        }
+
         return $search;
     }
 
@@ -53,8 +73,7 @@ class DeliveryRoundLoop extends BaseLoop implements PropelSearchLoopInterface
             $loopResultRow->set('CITY', $deliveryRound->getCity());
             $loopResultRow->set('ADDRESS', $deliveryRound->getAddress());
             $loopResultRow->set('DAY', $deliveryRound->getDay());
-            $loopResultRow->set('PRESENCE_TIME', $deliveryRound->getPresenceTime());
-            $loopResultRow->set('PRICE', $deliveryRound->getPrice());
+            $loopResultRow->set('DELIVERY_PERIOD', $deliveryRound->getDeliveryPeriod());
 
             $loopResult->addRow($loopResultRow);
         }

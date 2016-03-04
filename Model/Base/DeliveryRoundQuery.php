@@ -23,16 +23,14 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildDeliveryRoundQuery orderByCity($order = Criteria::ASC) Order by the city column
  * @method     ChildDeliveryRoundQuery orderByAddress($order = Criteria::ASC) Order by the address column
  * @method     ChildDeliveryRoundQuery orderByDay($order = Criteria::ASC) Order by the day column
- * @method     ChildDeliveryRoundQuery orderByPresenceTime($order = Criteria::ASC) Order by the presence_time column
- * @method     ChildDeliveryRoundQuery orderByPrice($order = Criteria::ASC) Order by the price column
+ * @method     ChildDeliveryRoundQuery orderByDeliveryPeriod($order = Criteria::ASC) Order by the delivery_period column
  *
  * @method     ChildDeliveryRoundQuery groupById() Group by the id column
  * @method     ChildDeliveryRoundQuery groupByZipCode() Group by the zip_code column
  * @method     ChildDeliveryRoundQuery groupByCity() Group by the city column
  * @method     ChildDeliveryRoundQuery groupByAddress() Group by the address column
  * @method     ChildDeliveryRoundQuery groupByDay() Group by the day column
- * @method     ChildDeliveryRoundQuery groupByPresenceTime() Group by the presence_time column
- * @method     ChildDeliveryRoundQuery groupByPrice() Group by the price column
+ * @method     ChildDeliveryRoundQuery groupByDeliveryPeriod() Group by the delivery_period column
  *
  * @method     ChildDeliveryRoundQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method     ChildDeliveryRoundQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -46,16 +44,14 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildDeliveryRound findOneByCity(string $city) Return the first ChildDeliveryRound filtered by the city column
  * @method     ChildDeliveryRound findOneByAddress(string $address) Return the first ChildDeliveryRound filtered by the address column
  * @method     ChildDeliveryRound findOneByDay(int $day) Return the first ChildDeliveryRound filtered by the day column
- * @method     ChildDeliveryRound findOneByPresenceTime(string $presence_time) Return the first ChildDeliveryRound filtered by the presence_time column
- * @method     ChildDeliveryRound findOneByPrice(string $price) Return the first ChildDeliveryRound filtered by the price column
+ * @method     ChildDeliveryRound findOneByDeliveryPeriod(string $delivery_period) Return the first ChildDeliveryRound filtered by the delivery_period column
  *
  * @method     array findById(int $id) Return ChildDeliveryRound objects filtered by the id column
  * @method     array findByZipCode(string $zip_code) Return ChildDeliveryRound objects filtered by the zip_code column
  * @method     array findByCity(string $city) Return ChildDeliveryRound objects filtered by the city column
  * @method     array findByAddress(string $address) Return ChildDeliveryRound objects filtered by the address column
  * @method     array findByDay(int $day) Return ChildDeliveryRound objects filtered by the day column
- * @method     array findByPresenceTime(string $presence_time) Return ChildDeliveryRound objects filtered by the presence_time column
- * @method     array findByPrice(string $price) Return ChildDeliveryRound objects filtered by the price column
+ * @method     array findByDeliveryPeriod(string $delivery_period) Return ChildDeliveryRound objects filtered by the delivery_period column
  *
  */
 abstract class DeliveryRoundQuery extends ModelCriteria
@@ -144,7 +140,7 @@ abstract class DeliveryRoundQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, ZIP_CODE, CITY, ADDRESS, DAY, PRESENCE_TIME, PRICE FROM delivery_round WHERE ID = :p0';
+        $sql = 'SELECT ID, ZIP_CODE, CITY, ADDRESS, DAY, DELIVERY_PERIOD FROM delivery_round WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -395,73 +391,32 @@ abstract class DeliveryRoundQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the presence_time column
+     * Filter the query on the delivery_period column
      *
      * Example usage:
      * <code>
-     * $query->filterByPresenceTime('fooValue');   // WHERE presence_time = 'fooValue'
-     * $query->filterByPresenceTime('%fooValue%'); // WHERE presence_time LIKE '%fooValue%'
+     * $query->filterByDeliveryPeriod('fooValue');   // WHERE delivery_period = 'fooValue'
+     * $query->filterByDeliveryPeriod('%fooValue%'); // WHERE delivery_period LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $presenceTime The value to use as filter.
+     * @param     string $deliveryPeriod The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildDeliveryRoundQuery The current query, for fluid interface
      */
-    public function filterByPresenceTime($presenceTime = null, $comparison = null)
+    public function filterByDeliveryPeriod($deliveryPeriod = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($presenceTime)) {
+            if (is_array($deliveryPeriod)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $presenceTime)) {
-                $presenceTime = str_replace('*', '%', $presenceTime);
+            } elseif (preg_match('/[\%\*]/', $deliveryPeriod)) {
+                $deliveryPeriod = str_replace('*', '%', $deliveryPeriod);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(DeliveryRoundTableMap::PRESENCE_TIME, $presenceTime, $comparison);
-    }
-
-    /**
-     * Filter the query on the price column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPrice(1234); // WHERE price = 1234
-     * $query->filterByPrice(array(12, 34)); // WHERE price IN (12, 34)
-     * $query->filterByPrice(array('min' => 12)); // WHERE price > 12
-     * </code>
-     *
-     * @param     mixed $price The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildDeliveryRoundQuery The current query, for fluid interface
-     */
-    public function filterByPrice($price = null, $comparison = null)
-    {
-        if (is_array($price)) {
-            $useMinMax = false;
-            if (isset($price['min'])) {
-                $this->addUsingAlias(DeliveryRoundTableMap::PRICE, $price['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($price['max'])) {
-                $this->addUsingAlias(DeliveryRoundTableMap::PRICE, $price['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(DeliveryRoundTableMap::PRICE, $price, $comparison);
+        return $this->addUsingAlias(DeliveryRoundTableMap::DELIVERY_PERIOD, $deliveryPeriod, $comparison);
     }
 
     /**

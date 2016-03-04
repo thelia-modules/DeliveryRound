@@ -14,8 +14,7 @@ CREATE TABLE IF NOT EXISTS `delivery_round`
     `city` VARCHAR(255) NOT NULL,
     `address` TEXT,
     `day` TINYINT NOT NULL,
-    `presence_time` TEXT,
-    `price` DECIMAL(16,6) DEFAULT 0.000000 NOT NULL,
+    `delivery_period` TEXT,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 

@@ -41,6 +41,7 @@ class DeliveryRoundForm extends BaseForm
                 'address',
                 'text',
                 [
+                    'required' => false,
                     'label' => $this->translator->trans('Address', [], DeliveryRound::DOMAIN_NAME),
                     'label_attr' => ['for' => 'address'],
                 ]
@@ -57,23 +58,14 @@ class DeliveryRoundForm extends BaseForm
                 ]
             )
             ->add(
-                'presence_time',
+                'delivery_period',
                 'text',
                 [
-                    'label' => $this->translator->trans('Presence time', [], DeliveryRound::DOMAIN_NAME),
+                    'required' => false,
+                    'label' => $this->translator->trans('Delivery period', [], DeliveryRound::DOMAIN_NAME),
                     'label_attr' => [
-                        'for' => 'presence_time',
-                        'placeholder' => '8:00 - 12:00'
+                        'for' => 'delivery_period'
                     ],
-                ]
-            )
-            ->add(
-                'price',
-                'number',
-                [
-                    'data' => 0,
-                    'label' => $this->translator->trans('Price', [], DeliveryRound::DOMAIN_NAME),
-                    'label_attr' => ['for' => 'price'],
                 ]
             );
     }

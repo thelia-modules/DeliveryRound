@@ -58,7 +58,7 @@ class DeliveryRoundTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 6;
 
     /**
      * The number of lazy-loaded columns
@@ -68,7 +68,7 @@ class DeliveryRoundTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /**
      * the column name for the ID field
@@ -96,14 +96,9 @@ class DeliveryRoundTableMap extends TableMap
     const DAY = 'delivery_round.DAY';
 
     /**
-     * the column name for the PRESENCE_TIME field
+     * the column name for the DELIVERY_PERIOD field
      */
-    const PRESENCE_TIME = 'delivery_round.PRESENCE_TIME';
-
-    /**
-     * the column name for the PRICE field
-     */
-    const PRICE = 'delivery_round.PRICE';
+    const DELIVERY_PERIOD = 'delivery_round.DELIVERY_PERIOD';
 
     /**
      * The default string format for model objects of the related table
@@ -126,12 +121,12 @@ class DeliveryRoundTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ZipCode', 'City', 'Address', 'Day', 'PresenceTime', 'Price', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'zipCode', 'city', 'address', 'day', 'presenceTime', 'price', ),
-        self::TYPE_COLNAME       => array(DeliveryRoundTableMap::ID, DeliveryRoundTableMap::ZIP_CODE, DeliveryRoundTableMap::CITY, DeliveryRoundTableMap::ADDRESS, DeliveryRoundTableMap::DAY, DeliveryRoundTableMap::PRESENCE_TIME, DeliveryRoundTableMap::PRICE, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'ZIP_CODE', 'CITY', 'ADDRESS', 'DAY', 'PRESENCE_TIME', 'PRICE', ),
-        self::TYPE_FIELDNAME     => array('id', 'zip_code', 'city', 'address', 'day', 'presence_time', 'price', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id', 'ZipCode', 'City', 'Address', 'Day', 'DeliveryPeriod', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'zipCode', 'city', 'address', 'day', 'deliveryPeriod', ),
+        self::TYPE_COLNAME       => array(DeliveryRoundTableMap::ID, DeliveryRoundTableMap::ZIP_CODE, DeliveryRoundTableMap::CITY, DeliveryRoundTableMap::ADDRESS, DeliveryRoundTableMap::DAY, DeliveryRoundTableMap::DELIVERY_PERIOD, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'ZIP_CODE', 'CITY', 'ADDRESS', 'DAY', 'DELIVERY_PERIOD', ),
+        self::TYPE_FIELDNAME     => array('id', 'zip_code', 'city', 'address', 'day', 'delivery_period', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -141,12 +136,12 @@ class DeliveryRoundTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ZipCode' => 1, 'City' => 2, 'Address' => 3, 'Day' => 4, 'PresenceTime' => 5, 'Price' => 6, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'zipCode' => 1, 'city' => 2, 'address' => 3, 'day' => 4, 'presenceTime' => 5, 'price' => 6, ),
-        self::TYPE_COLNAME       => array(DeliveryRoundTableMap::ID => 0, DeliveryRoundTableMap::ZIP_CODE => 1, DeliveryRoundTableMap::CITY => 2, DeliveryRoundTableMap::ADDRESS => 3, DeliveryRoundTableMap::DAY => 4, DeliveryRoundTableMap::PRESENCE_TIME => 5, DeliveryRoundTableMap::PRICE => 6, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ZIP_CODE' => 1, 'CITY' => 2, 'ADDRESS' => 3, 'DAY' => 4, 'PRESENCE_TIME' => 5, 'PRICE' => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'zip_code' => 1, 'city' => 2, 'address' => 3, 'day' => 4, 'presence_time' => 5, 'price' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ZipCode' => 1, 'City' => 2, 'Address' => 3, 'Day' => 4, 'DeliveryPeriod' => 5, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'zipCode' => 1, 'city' => 2, 'address' => 3, 'day' => 4, 'deliveryPeriod' => 5, ),
+        self::TYPE_COLNAME       => array(DeliveryRoundTableMap::ID => 0, DeliveryRoundTableMap::ZIP_CODE => 1, DeliveryRoundTableMap::CITY => 2, DeliveryRoundTableMap::ADDRESS => 3, DeliveryRoundTableMap::DAY => 4, DeliveryRoundTableMap::DELIVERY_PERIOD => 5, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ZIP_CODE' => 1, 'CITY' => 2, 'ADDRESS' => 3, 'DAY' => 4, 'DELIVERY_PERIOD' => 5, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'zip_code' => 1, 'city' => 2, 'address' => 3, 'day' => 4, 'delivery_period' => 5, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
     );
 
     /** The enumerated values for this table */
@@ -213,8 +208,7 @@ class DeliveryRoundTableMap extends TableMap
   5 => 'saturday',
   6 => 'sunday',
 ));
-        $this->addColumn('PRESENCE_TIME', 'PresenceTime', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('PRICE', 'Price', 'DECIMAL', true, 16, 0);
+        $this->addColumn('DELIVERY_PERIOD', 'DeliveryPeriod', 'LONGVARCHAR', false, null, null);
     } // initialize()
 
     /**
@@ -367,16 +361,14 @@ class DeliveryRoundTableMap extends TableMap
             $criteria->addSelectColumn(DeliveryRoundTableMap::CITY);
             $criteria->addSelectColumn(DeliveryRoundTableMap::ADDRESS);
             $criteria->addSelectColumn(DeliveryRoundTableMap::DAY);
-            $criteria->addSelectColumn(DeliveryRoundTableMap::PRESENCE_TIME);
-            $criteria->addSelectColumn(DeliveryRoundTableMap::PRICE);
+            $criteria->addSelectColumn(DeliveryRoundTableMap::DELIVERY_PERIOD);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.ZIP_CODE');
             $criteria->addSelectColumn($alias . '.CITY');
             $criteria->addSelectColumn($alias . '.ADDRESS');
             $criteria->addSelectColumn($alias . '.DAY');
-            $criteria->addSelectColumn($alias . '.PRESENCE_TIME');
-            $criteria->addSelectColumn($alias . '.PRICE');
+            $criteria->addSelectColumn($alias . '.DELIVERY_PERIOD');
         }
     }
 

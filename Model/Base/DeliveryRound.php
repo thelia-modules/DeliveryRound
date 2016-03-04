@@ -82,17 +82,10 @@ abstract class DeliveryRound implements ActiveRecordInterface
     protected $day;
 
     /**
-     * The value for the presence_time field.
+     * The value for the delivery_period field.
      * @var        string
      */
-    protected $presence_time;
-
-    /**
-     * The value for the price field.
-     * Note: this column has a database default value of: '0.000000'
-     * @var        string
-     */
-    protected $price;
+    protected $delivery_period;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -103,23 +96,10 @@ abstract class DeliveryRound implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Applies default values to this object.
-     * This method should be called from the object's constructor (or
-     * equivalent initialization method).
-     * @see __construct()
-     */
-    public function applyDefaultValues()
-    {
-        $this->price = '0.000000';
-    }
-
-    /**
      * Initializes internal state of DeliveryRound\Model\Base\DeliveryRound object.
-     * @see applyDefaults()
      */
     public function __construct()
     {
-        $this->applyDefaultValues();
     }
 
     /**
@@ -436,25 +416,14 @@ abstract class DeliveryRound implements ActiveRecordInterface
     }
 
     /**
-     * Get the [presence_time] column value.
+     * Get the [delivery_period] column value.
      *
      * @return   string
      */
-    public function getPresenceTime()
+    public function getDeliveryPeriod()
     {
 
-        return $this->presence_time;
-    }
-
-    /**
-     * Get the [price] column value.
-     *
-     * @return   string
-     */
-    public function getPrice()
-    {
-
-        return $this->price;
+        return $this->delivery_period;
     }
 
     /**
@@ -567,46 +536,25 @@ abstract class DeliveryRound implements ActiveRecordInterface
     } // setDay()
 
     /**
-     * Set the value of [presence_time] column.
+     * Set the value of [delivery_period] column.
      *
      * @param      string $v new value
      * @return   \DeliveryRound\Model\DeliveryRound The current object (for fluent API support)
      */
-    public function setPresenceTime($v)
+    public function setDeliveryPeriod($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->presence_time !== $v) {
-            $this->presence_time = $v;
-            $this->modifiedColumns[DeliveryRoundTableMap::PRESENCE_TIME] = true;
+        if ($this->delivery_period !== $v) {
+            $this->delivery_period = $v;
+            $this->modifiedColumns[DeliveryRoundTableMap::DELIVERY_PERIOD] = true;
         }
 
 
         return $this;
-    } // setPresenceTime()
-
-    /**
-     * Set the value of [price] column.
-     *
-     * @param      string $v new value
-     * @return   \DeliveryRound\Model\DeliveryRound The current object (for fluent API support)
-     */
-    public function setPrice($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->price !== $v) {
-            $this->price = $v;
-            $this->modifiedColumns[DeliveryRoundTableMap::PRICE] = true;
-        }
-
-
-        return $this;
-    } // setPrice()
+    } // setDeliveryPeriod()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -618,10 +566,6 @@ abstract class DeliveryRound implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->price !== '0.000000') {
-                return false;
-            }
-
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -664,11 +608,8 @@ abstract class DeliveryRound implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : DeliveryRoundTableMap::translateFieldName('Day', TableMap::TYPE_PHPNAME, $indexType)];
             $this->day = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : DeliveryRoundTableMap::translateFieldName('PresenceTime', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->presence_time = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : DeliveryRoundTableMap::translateFieldName('Price', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->price = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : DeliveryRoundTableMap::translateFieldName('DeliveryPeriod', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->delivery_period = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -677,7 +618,7 @@ abstract class DeliveryRound implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = DeliveryRoundTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = DeliveryRoundTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \DeliveryRound\Model\DeliveryRound object", 0, $e);
@@ -901,11 +842,8 @@ abstract class DeliveryRound implements ActiveRecordInterface
         if ($this->isColumnModified(DeliveryRoundTableMap::DAY)) {
             $modifiedColumns[':p' . $index++]  = 'DAY';
         }
-        if ($this->isColumnModified(DeliveryRoundTableMap::PRESENCE_TIME)) {
-            $modifiedColumns[':p' . $index++]  = 'PRESENCE_TIME';
-        }
-        if ($this->isColumnModified(DeliveryRoundTableMap::PRICE)) {
-            $modifiedColumns[':p' . $index++]  = 'PRICE';
+        if ($this->isColumnModified(DeliveryRoundTableMap::DELIVERY_PERIOD)) {
+            $modifiedColumns[':p' . $index++]  = 'DELIVERY_PERIOD';
         }
 
         $sql = sprintf(
@@ -933,11 +871,8 @@ abstract class DeliveryRound implements ActiveRecordInterface
                     case 'DAY':
                         $stmt->bindValue($identifier, $this->day, PDO::PARAM_INT);
                         break;
-                    case 'PRESENCE_TIME':
-                        $stmt->bindValue($identifier, $this->presence_time, PDO::PARAM_STR);
-                        break;
-                    case 'PRICE':
-                        $stmt->bindValue($identifier, $this->price, PDO::PARAM_STR);
+                    case 'DELIVERY_PERIOD':
+                        $stmt->bindValue($identifier, $this->delivery_period, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -1017,10 +952,7 @@ abstract class DeliveryRound implements ActiveRecordInterface
                 return $this->getDay();
                 break;
             case 5:
-                return $this->getPresenceTime();
-                break;
-            case 6:
-                return $this->getPrice();
+                return $this->getDeliveryPeriod();
                 break;
             default:
                 return null;
@@ -1055,8 +987,7 @@ abstract class DeliveryRound implements ActiveRecordInterface
             $keys[2] => $this->getCity(),
             $keys[3] => $this->getAddress(),
             $keys[4] => $this->getDay(),
-            $keys[5] => $this->getPresenceTime(),
-            $keys[6] => $this->getPrice(),
+            $keys[5] => $this->getDeliveryPeriod(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach ($virtualColumns as $key => $virtualColumn) {
@@ -1116,10 +1047,7 @@ abstract class DeliveryRound implements ActiveRecordInterface
                 $this->setDay($value);
                 break;
             case 5:
-                $this->setPresenceTime($value);
-                break;
-            case 6:
-                $this->setPrice($value);
+                $this->setDeliveryPeriod($value);
                 break;
         } // switch()
     }
@@ -1150,8 +1078,7 @@ abstract class DeliveryRound implements ActiveRecordInterface
         if (array_key_exists($keys[2], $arr)) $this->setCity($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setAddress($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setDay($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setPresenceTime($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setPrice($arr[$keys[6]]);
+        if (array_key_exists($keys[5], $arr)) $this->setDeliveryPeriod($arr[$keys[5]]);
     }
 
     /**
@@ -1168,8 +1095,7 @@ abstract class DeliveryRound implements ActiveRecordInterface
         if ($this->isColumnModified(DeliveryRoundTableMap::CITY)) $criteria->add(DeliveryRoundTableMap::CITY, $this->city);
         if ($this->isColumnModified(DeliveryRoundTableMap::ADDRESS)) $criteria->add(DeliveryRoundTableMap::ADDRESS, $this->address);
         if ($this->isColumnModified(DeliveryRoundTableMap::DAY)) $criteria->add(DeliveryRoundTableMap::DAY, $this->day);
-        if ($this->isColumnModified(DeliveryRoundTableMap::PRESENCE_TIME)) $criteria->add(DeliveryRoundTableMap::PRESENCE_TIME, $this->presence_time);
-        if ($this->isColumnModified(DeliveryRoundTableMap::PRICE)) $criteria->add(DeliveryRoundTableMap::PRICE, $this->price);
+        if ($this->isColumnModified(DeliveryRoundTableMap::DELIVERY_PERIOD)) $criteria->add(DeliveryRoundTableMap::DELIVERY_PERIOD, $this->delivery_period);
 
         return $criteria;
     }
@@ -1237,8 +1163,7 @@ abstract class DeliveryRound implements ActiveRecordInterface
         $copyObj->setCity($this->getCity());
         $copyObj->setAddress($this->getAddress());
         $copyObj->setDay($this->getDay());
-        $copyObj->setPresenceTime($this->getPresenceTime());
-        $copyObj->setPrice($this->getPrice());
+        $copyObj->setDeliveryPeriod($this->getDeliveryPeriod());
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1277,11 +1202,9 @@ abstract class DeliveryRound implements ActiveRecordInterface
         $this->city = null;
         $this->address = null;
         $this->day = null;
-        $this->presence_time = null;
-        $this->price = null;
+        $this->delivery_period = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
-        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);

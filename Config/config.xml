@@ -9,6 +9,7 @@
     </loops>
 
     <forms>
+        <form name="deliveryround_config_form" class="DeliveryRound\Form\DeliveryRoundConfigForm" />
         <form name="deliveryround_form" class="DeliveryRound\Form\DeliveryRoundForm" />
         <form name="deliveryround_delete_form" class="DeliveryRound\Form\DeliveryRoundDeleteForm" />
     </forms>
@@ -16,6 +17,7 @@
     <hooks>
         <hook id="deliveryround.hook" class="DeliveryRound\Hook\DeliveryRoundHook" scope="request">
             <tag name="hook.event_listener" event="module.configuration" type="back" method="onModuleConfig" />
+            <tag name="hook.event_listener" event="order-delivery.extra" type="front" method="onOrderDeliveryExtra"/>
         </hook>
     </hooks>
 
