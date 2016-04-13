@@ -82,14 +82,14 @@ class DeliveryRound extends AbstractDeliveryModule
      */
     protected function getCurrentlySelectedAddress($request, $customer)
     {
-        if (empty($request->request->get('address_id'))) {
+        $currentAddressId = $request->request->get('address_id');
+
+        if (empty($currentAddressId)) {
             $currentAddressId = AddressQuery::create()
                 ->filterByCustomer($customer)
                 ->filterByIsDefault(1)
                 ->select('ID')
                 ->findOne();
-        } else {
-            $currentAddressId = $request->request->get('address_id');
         }
 
         return $currentAddressId;
