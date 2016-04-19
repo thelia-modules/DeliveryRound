@@ -29,6 +29,7 @@ class DeliveryRoundLoop extends BaseLoop implements PropelSearchLoopInterface
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createAnyListTypeArgument('zipcode'),
+            Argument::createAnyListTypeArgument('city'),
             Argument::createEnumListTypeArgument('day', DeliveryRoundTableMap::getValueSet(DeliveryRoundTableMap::DAY))
         );
     }
@@ -48,6 +49,9 @@ class DeliveryRoundLoop extends BaseLoop implements PropelSearchLoopInterface
 
         if ($this->getZipcode() !== null) {
             $search->filterByZipCode($this->getZipcode(), Criteria::IN);
+        }
+        if ($this->getCity() !== null) {
+            $search->filterByCity($this->getCity(), Criteria::IN);
         }
 
         if ($this->getDay() !== null) {
