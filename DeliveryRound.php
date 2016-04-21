@@ -53,9 +53,20 @@ class DeliveryRound extends AbstractDeliveryModule
      */
     public function isValidDelivery(Country $country)
     {
-        // Get current customer & addressId
-        $customer = $this->getRequest()->getSession()->getCustomerUser();
-        $currentAddressId = $this->getCurrentlySelectedAddress($this->getRequest(), $customer);
+        // Get current addressId
+        $currentAddressId = $this->getRequest()->request->get('address_id');
+
+        if (empty($currentAddressId)) {
+            if (null !== $customer = $this->getRequest()->getSession()->getCustomerUser()) {
+                $currentAddressId = AddressQuery::create()
+                    ->filterByCustomer($customer)
+                    ->filterByIsDefault(1)
+                    ->select('ID')
+                    ->findOne();
+            } else {
+                return false;
+            }
+        }
 
         // Get delivered zipcodes
         $deliveryRounds = DeliveryRoundQuery::create()->find();
@@ -66,7 +77,7 @@ class DeliveryRound extends AbstractDeliveryModule
             $deliveryRoundZipcode[] = $deliveryRound->getZipCode();
         }
 
-        // Check if the customer's current address is deliverable
+        // Check if the customer's current address is in delivered zipcodes
         if (null !== AddressQuery::create()->filterByZipcode($deliveryRoundZipcode)->findOneById($currentAddressId)) {
             return true;
         } else {
@@ -75,22 +86,14 @@ class DeliveryRound extends AbstractDeliveryModule
     }
 
     /**
-     * @param \Thelia\Core\HttpFoundation\Request $request
-     * @param \Thelia\Model\Customer $customer
-     * @return array|mixed|\Propel\Runtime\Collection\ObjectCollection
+     * @param $request
+     * @return mixed
      * @throws \Propel\Runtime\Exception\PropelException
      */
-    protected function getCurrentlySelectedAddress($request, $customer)
+    protected function getCurrentlySelectedAddress($request)
     {
-        $currentAddressId = $request->request->get('address_id');
 
-        if (empty($currentAddressId)) {
-            $currentAddressId = AddressQuery::create()
-                ->filterByCustomer($customer)
-                ->filterByIsDefault(1)
-                ->select('ID')
-                ->findOne();
-        }
+
 
         return $currentAddressId;
     }
