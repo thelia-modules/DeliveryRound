@@ -1,0 +1,21 @@
+<script>
+    $(document).ready(function () {
+        $(".update-delivery-round").on('click', function () {
+            var $this = $(this);
+            $('#delivery-round-id').val($this.data('id'));
+            $('#delivery-round-zipcode-update').val($this.data('zipcode'));
+            $('#delivery-round-city-update').val($this.data('city'));
+            $('#delivery-round-address-update').val($this.data('address'));
+            $('#delivery-round-delivery_period-update').val($this.data('period'));
+            $('#delivery-round-day-update').find('option').each(function () {
+                var option = $(this);
+                if (option.html() == $this.data('day')) {
+                    option.prop('selected', true);
+                } else {
+                    option.prop('selected', false);
+                }
+            });
+
+        });
+    });
+</script>

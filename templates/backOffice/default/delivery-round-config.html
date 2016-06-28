@@ -4,7 +4,7 @@
     </div>
 
     {form name='deliveryround_config_form'}
-        <form action="{url path='/admin/module/DeliveryRound/config'}" method="post">
+        <form action="{url path='/admin/module/DeliveryRound/config'}" method="post" class="form-inline">
 
             {form_hidden_fields form=$form}
 
@@ -12,23 +12,20 @@
                 <div class="alert alert-danger">{$form_error_message}</div>
             {/if}
 
-            <div class="row">
-                <div class="col-md-1">
-                    {form_field form=$form field="price"}
-                        <div class="form-group">
-                            <label class="control-label" for="{$label_attr.for}">
-                                {$label}
-                            </label>
+            {form_field form=$form field="price"}
+                <div class="form-group">
+                    <label class="control-label" for="{$label_attr.for}">
+                        {$label}
+                    </label>
 
-                            <input type="text" id="{$label_attr.for}" class="form-control" name="{$name}" value="{$value}" {if $required}required{/if} />
-                        </div>
-                    {/form_field}
+                    <input type="text" id="{$label_attr.for}" class="form-control" name="{$name}" value="{$value}"
+                           {if $required}required{/if} />
                 </div>
+            {/form_field}
 
-                <div class="col-md-1">
-                    <label class="control-label"></label>
-                    <button class="btn btn-info form-control" type="submit">{intl l='Save' d='deliveryround.bo.default'}</button>
-                </div>
+            <div class="form-group">
+                <button class="btn btn-info"
+                        type="submit">{intl l='Save' d='deliveryround.bo.default'}</button>
             </div>
         </form>
     {/form}
@@ -57,7 +54,8 @@
                                 {$label} {if $required}*{/if}
                             </label>
 
-                            <input type="text" id="{$label_attr.for}" class="form-control" name="{$name}" {if $required}required{/if} />
+                            <input type="text" id="{$label_attr.for}" class="form-control" name="{$name}"
+                                   {if $required}required{/if} />
                         </div>
                     {/form_field}
                 </div>
@@ -69,7 +67,8 @@
                                 {$label} {if $required}*{/if}
                             </label>
 
-                            <input type="text" id="{$label_attr.for}" class="form-control" name="{$name}" {if $required}required{/if} />
+                            <input type="text" id="{$label_attr.for}" class="form-control" name="{$name}"
+                                   {if $required}required{/if} />
                         </div>
                     {/form_field}
                 </div>
@@ -81,7 +80,8 @@
                                 {$label} {if $required}*{/if}
                             </label>
 
-                            <input type="text" id="{$label_attr.for}" class="form-control" name="{$name}" {if $required}required{/if} />
+                            <input type="text" id="{$label_attr.for}" class="form-control" name="{$name}"
+                                   {if $required}required{/if} />
                         </div>
                     {/form_field}
                 </div>
@@ -93,12 +93,13 @@
                             <label class="control-label" for="{$label_attr.for}">
                                 {$label} {if $required}*{/if}
                                 {form_error form=$form field="day"}
-                                    <br />
+                                    <br/>
                                     <span class="error">{$message}</span>
                                 {/form_error}
                             </label>
 
-                            <select id="{$label_attr.for}" class="form-control" name="{$name}" {if $required}required{/if} >
+                            <select id="{$label_attr.for}" class="form-control" name="{$name}"
+                                    {if $required}required{/if} >
                                 {foreach $choices as $choice}
                                     <option value="{$choice->value}">{$choice->label|date_format:"%A"}</option>
                                 {/foreach}
@@ -114,14 +115,16 @@
                                 {$label} {if $required}*{/if}
                             </label>
 
-                            <input type="text" id="{$label_attr.for}" class="form-control" name="{$name}" {if $required}required{/if} placeholder="{$label_attr.placeholder}" />
+                            <input type="text" id="{$label_attr.for}" class="form-control" name="{$name}"
+                                   {if $required}required{/if} placeholder="{$label_attr.placeholder}"/>
                         </div>
                     {/form_field}
                 </div>
 
                 <div class="col-md-1">
                     <label class="control-label"></label>
-                    <button class="btn btn-info form-control" type="submit">{intl l='Save' d='deliveryround.bo.default'}</button>
+                    <button class="btn btn-info form-control"
+                            type="submit">{intl l='Save' d='deliveryround.bo.default'}</button>
                 </div>
 
             </div>
@@ -134,43 +137,73 @@
         <div class="col-md-12">
             <table class="table table-striped">
                 <thead>
-                    <tr>
-                        <th>{intl l='ZipCode' d='deliveryround.bo.default'}</th>
-                        <th>{intl l='City' d='deliveryround.bo.default'}</th>
-                        <th>{intl l='Address' d='deliveryround.bo.default'}</th>
-                        <th>{intl l='Day' d='deliveryround.bo.default'}</th>
-                        <th>{intl l='Delivery period' d='deliveryround.bo.default'}</th>
-                        <th>{intl l='Remove' d='deliveryround.bo.default'}</th>
-                    </tr>
+                <tr>
+                    <th>{intl l='ZipCode' d='deliveryround.bo.default'}</th>
+                    <th>{intl l='City' d='deliveryround.bo.default'}</th>
+                    <th>{intl l='Address' d='deliveryround.bo.default'}</th>
+                    <th>{intl l='Day' d='deliveryround.bo.default'}</th>
+                    <th>{intl l='Delivery period' d='deliveryround.bo.default'}</th>
+                    <th>{intl l='Remove' d='deliveryround.bo.default'}</th>
+                </tr>
                 </thead>
                 <tbody>
-                    {loop type='deliveryround' name='deliveryround-loop'}
-                        <tr>
-                            <td>{$ZIPCODE}</td>
-                            <td>{$CITY}</td>
-                            <td>{$ADDRESS}</td>
-                            <td>{$DAY|date_format:"%A"}</td>
-                            <td>{$DELIVERY_PERIOD}</td>
-                            <td>
-                                {form name='deliveryround_delete_form'}
-                                    <form action="{url path='/admin/module/DeliveryRound/delete'}" method="post">
+                {loop type='deliveryround' name='deliveryround-loop'}
+                    <tr>
+                        <td>{$ZIPCODE}</td>
+                        <td>{$CITY}</td>
+                        <td>{$ADDRESS}</td>
+                        <td>{$DAY|date_format:"%A"}</td>
+                        <td>{$DELIVERY_PERIOD}</td>
+                        <td>
+                            {loop name="auth-edit" type="auth" role="ADMIN" access="UPDATE" module="Dealer"}
+                                <a class="btn btn-default btn-xs update-delivery-round" title="{intl l='Update'}" href="#"
+                                   data-target="#deliveryround-update" data-toggle="modal"
+                                   data-id="{$ID}"
+                                   data-zipcode="{$ZIPCODE}"
+                                   data-city="{$CITY}"
+                                   data-address="{$ADDRESS}"
+                                   data-day="{$DAY|date_format:"%A"}"
+                                   data-period="{$DELIVERY_PERIOD}"
+                                >
+                                    <i class="glyphicon glyphicon-edit"></i>
+                                </a>
+                            {/loop}
+                            {form name='deliveryround_delete_form'}
+                                <form action="{url path='/admin/module/DeliveryRound/delete'}" method="post">
 
-                                        {form_hidden_fields form=$form}
+                                    {form_hidden_fields form=$form}
 
-                                        {form_field form=$form field="id"}
-                                                <input type="hidden" name="{$name}" value="{$ID}" {if $required}required{/if} />
-                                        {/form_field}
+                                    {form_field form=$form field="id"}
+                                        <input type="hidden" name="{$name}" value="{$ID}" {if $required}required{/if} />
+                                    {/form_field}
 
-                                        <button class="btn btn-default" type="submit">
-                                            <span class="glyphicon glyphicon-trash"></span>
-                                        </button>
-                                    </form>
-                                {/form}
-                            </td>
-                        </tr>
-                    {/loop}
+                                    <button class="btn btn-default" type="submit">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </button>
+                                </form>
+                            {/form}
+                        </td>
+                    </tr>
+                {/loop}
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+{form name="deliveryround_update_form"}
+{capture "deliveryround_update"}
+    {include file="form/delivery-round-update-form.html" form=$form}
+{/capture}
+
+    {include file="includes/generic-create-dialog.html"
+    dialog_id       = "deliveryround-update"
+    dialog_title    = {intl l="Update"}
+    dialog_body     = {$smarty.capture.deliveryround_update nofilter}
+dialog_ok_label     = {intl l="Create"}
+dialog_cancel_label = {intl l="Cancel"}
+
+form_action        = {url path="/admin/module/DeliveryRound/update"}
+form_enctype       = {form_enctype form=$form}
+}
+{/form}

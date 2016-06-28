@@ -24,7 +24,7 @@ class DeliveryRoundForm extends BaseForm
                     'constraints' => [new Constraints\NotBlank()],
                     'required' => true,
                     'label' => $this->translator->trans('ZipCode', [], DeliveryRound::DOMAIN_NAME),
-                    'label_attr' => ['for' => 'zipcode'],
+                    'label_attr' => ['for' => 'delivery-round-zipcode'],
                 ]
             )
             ->add(
@@ -34,7 +34,7 @@ class DeliveryRoundForm extends BaseForm
                     'constraints' => [new Constraints\NotBlank()],
                     'required' => true,
                     'label' => $this->translator->trans('City', [], DeliveryRound::DOMAIN_NAME),
-                    'label_attr' => ['for' => 'city'],
+                    'label_attr' => ['for' => 'delivery-round-city'],
                 ]
             )
             ->add(
@@ -43,7 +43,7 @@ class DeliveryRoundForm extends BaseForm
                 [
                     'required' => false,
                     'label' => $this->translator->trans('Address', [], DeliveryRound::DOMAIN_NAME),
-                    'label_attr' => ['for' => 'address'],
+                    'label_attr' => ['for' => 'delivery-round-address'],
                 ]
             )
             ->add(
@@ -54,7 +54,7 @@ class DeliveryRoundForm extends BaseForm
                     'constraints' => [new Constraints\NotBlank()],
                     'required' => true,
                     'label' => $this->translator->trans('Day', [], DeliveryRound::DOMAIN_NAME),
-                    'label_attr' => ['for' => 'day'],
+                    'label_attr' => ['for' => 'delivery-round-day'],
                 ]
             )
             ->add(
@@ -64,7 +64,7 @@ class DeliveryRoundForm extends BaseForm
                     'required' => false,
                     'label' => $this->translator->trans('Delivery period', [], DeliveryRound::DOMAIN_NAME),
                     'label_attr' => [
-                        'for' => 'delivery_period'
+                        'for' => 'delivery-round-delivery_period'
                     ],
                 ]
             );
