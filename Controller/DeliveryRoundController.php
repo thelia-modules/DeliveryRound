@@ -5,6 +5,8 @@ namespace DeliveryRound\Controller;
 use DeliveryRound\DeliveryRound;
 use DeliveryRound\Model\DeliveryRound as DeliveryRoundModel;
 use DeliveryRound\Model\DeliveryRoundQuery;
+use Propel\Runtime\Map\TableMap;
+use Propel\Runtime\Propel;
 use Thelia\Controller\Admin\BaseAdminController;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
@@ -35,7 +37,6 @@ class DeliveryRoundController extends BaseAdminController
 
             // Configure price
             DeliveryRound::setConfigValue('price', $vForm->get('price')->getData());
-
         } catch (FormValidationException $ex) {
             $error = $this->createStandardFormValidationErrorMessage($ex);
         } catch (\Exception $ex) {
@@ -78,7 +79,6 @@ class DeliveryRoundController extends BaseAdminController
                 ->setDay($vForm->get('day')->getData())
                 ->setDeliveryPeriod($vForm->get('delivery_period')->getData())
                 ->save();
-
         } catch (FormValidationException $ex) {
             $error = $this->createStandardFormValidationErrorMessage($ex);
         } catch (\Exception $ex) {
@@ -115,11 +115,56 @@ class DeliveryRoundController extends BaseAdminController
 
             // Remove entry
             DeliveryRoundQuery::create()->filterById($vForm->get('id')->getData())->delete();
-
         } catch (FormValidationException $ex) {
             $error = $this->createStandardFormValidationErrorMessage($ex);
         } catch (\Exception $ex) {
             $error = $ex->getMessage();
+        }
+
+        if ($error !== null) {
+            $this->setupFormErrorContext(
+                $this->getTranslator()->trans("DeliveryRound configuration", [], DeliveryRound::DOMAIN_NAME),
+                $error,
+                $form,
+                $ex
+            );
+        }
+
+        return $this->render('module-configure', array('module_code' => 'DeliveryRound'));
+    }
+
+    /**
+     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     */
+    public function updateAction()
+    {
+        if (null !== $response = $this->checkAuth([AdminResources::MODULE], ["DeliveryRound"], AccessManager::UPDATE)) {
+            return $response;
+        }
+
+        $con = Propel::getConnection();
+        $con->beginTransaction();
+
+        $form = $this->createForm('deliveryround_update_form');
+        $error = null;
+        $ex = null;
+
+        try {
+            $vForm = $this->validateForm($form);
+            $data = $vForm->getData();
+
+            $model = DeliveryRoundQuery::create()->findOneById($data['id']);
+
+            $model->fromArray($data, TableMap::TYPE_FIELDNAME);
+            $model->save();
+
+            $con->commit();
+        } catch (FormValidationException $ex) {
+            $error = $this->createStandardFormValidationErrorMessage($ex);
+            $con->rollBack();
+        } catch (\Exception $ex) {
+            $error = $ex->getMessage();
+            $con->rollBack();
         }
 
         if ($error !== null) {

@@ -16,4 +16,8 @@
         <default key="_controller">DeliveryRound:DeliveryRound:delete</default>
     </route>
 
+    <route id="deliveryround.update" path="/admin/module/DeliveryRound/update">
+        <default key="_controller">DeliveryRound:DeliveryRound:update</default>
+    </route>
+
 </routes>

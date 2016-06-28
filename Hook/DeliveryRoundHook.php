@@ -16,6 +16,11 @@ class DeliveryRoundHook extends BaseHook
     {
         $event->add($this->render('delivery-round-config.html'));
     }
+    
+    public function onModuleConfigJs(HookRenderEvent $event)
+    {
+        $event->add($this->render('script/delivery-round-update-js.html'));
+    }
 
     public function onOrderDeliveryExtra(HookRenderEvent $event)
     {

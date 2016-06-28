@@ -1,0 +1,66 @@
+{form_hidden_fields form=$form}
+
+{if $form_error}
+    <div class="alert alert-danger">{$form_error_message}</div>
+{/if}
+{form_field form=$form field="id"}
+        <input type="hidden" id="{$label_attr.for}" name="{$name}"/>
+{/form_field}
+{form_field form=$form field="zipcode"}
+    <div class="form-group">
+        <label class="control-label" for="{$label_attr.for}-update">
+            {$label} {if $required}*{/if}
+        </label>
+
+        <input type="text" id="{$label_attr.for}-update" class="form-control" name="{$name}"
+               {if $required}required{/if} value="{$value}"/>
+    </div>
+{/form_field}
+{form_field form=$form field="city"}
+    <div class="form-group">
+        <label class="control-label" for="{$label_attr.for}-update">
+            {$label} {if $required}*{/if}
+        </label>
+
+        <input type="text" id="{$label_attr.for}-update" class="form-control" name="{$name}"
+               {if $required}required{/if} />
+    </div>
+{/form_field}
+{form_field form=$form field="address"}
+    <div class="form-group">
+        <label class="control-label" for="{$label_attr.for}-update">
+            {$label} {if $required}*{/if}
+        </label>
+
+        <input type="text" id="{$label_attr.for}-update" class="form-control" name="{$name}"
+               {if $required}required{/if} />
+    </div>
+{/form_field}
+{form_field form=$form field="day"}
+    <div class="form-group {if $error}has-error{/if}">
+        <label class="control-label" for="{$label_attr.for}-update">
+            {$label} {if $required}*{/if}
+            {form_error form=$form field="day"}
+                <br/>
+                <span class="error">{$message}</span>
+            {/form_error}
+        </label>
+
+        <select id="{$label_attr.for}-update" class="form-control" name="{$name}"
+                {if $required}required{/if} >
+            {foreach $choices as $choice}
+                <option value="{$choice->value}">{$choice->label|date_format:"%A"}</option>
+            {/foreach}
+        </select>
+    </div>
+{/form_field}
+{form_field form=$form field="delivery_period"}
+    <div class="form-group">
+        <label class="control-label" for="{$label_attr.for}-update">
+            {$label} {if $required}*{/if}
+        </label>
+
+        <input type="text" id="{$label_attr.for}-update" class="form-control" name="{$name}"
+               {if $required}required{/if} placeholder="{$label_attr.placeholder}"/>
+    </div>
+{/form_field}
