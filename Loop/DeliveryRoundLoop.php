@@ -30,7 +30,15 @@ class DeliveryRoundLoop extends BaseLoop implements PropelSearchLoopInterface
             Argument::createIntListTypeArgument('id'),
             Argument::createAnyListTypeArgument('zipcode'),
             Argument::createAnyListTypeArgument('city'),
-            Argument::createEnumListTypeArgument('day', DeliveryRoundTableMap::getValueSet(DeliveryRoundTableMap::DAY))
+            Argument::createEnumListTypeArgument('day', DeliveryRoundTableMap::getValueSet(DeliveryRoundTableMap::DAY)),
+            Argument::createEnumListTypeArgument('order', [
+                'day',
+                'day-reverse',
+                'city',
+                'city-reverse',
+                'zipcode',
+                'zipcode-reverse'
+            ], 'day')
         );
     }
 
@@ -41,7 +49,7 @@ class DeliveryRoundLoop extends BaseLoop implements PropelSearchLoopInterface
      */
     public function buildModelCriteria()
     {
-        $search = DeliveryRoundQuery::create()->orderByDay(Criteria::ASC);
+        $search = DeliveryRoundQuery::create();
 
         if ($this->getId() !== null) {
             $search->filterById($this->getId(), Criteria::IN);
@@ -56,6 +64,29 @@ class DeliveryRoundLoop extends BaseLoop implements PropelSearchLoopInterface
 
         if ($this->getDay() !== null) {
             $search->filterByDay($this->getDay(), Criteria::IN);
+        }
+
+        foreach ($this->getOrder() as $order) {
+            switch ($order) {
+                case 'day':
+                    $search->orderByDay();
+                    break;
+                case 'day-reverse':
+                    $search->orderByDay(Criteria::DESC);
+                    break;
+                case 'city':
+                    $search->orderByCity();
+                    break;
+                case 'city-reverse':
+                    $search->orderByCity(Criteria::DESC);
+                    break;
+                case 'zipcode':
+                    $search->orderByZipCode();
+                    break;
+                case 'zipcode-reverse':
+                    $search->orderByZipCode(Criteria::DESC);
+                    break;
+            }
         }
 
         return $search;
