@@ -13,7 +13,7 @@
         <language>en_US</language>
         <language>fr_FR</language>
     </languages>
-    <version>1.2.2</version>
+    <version>1.3</version>
     <authors>
         <author>
             <name>Etienne Perriere</name>
@@ -21,6 +21,6 @@
         </author>
     </authors>
     <type>delivery</type>
-    <thelia>2.2.0</thelia>
+    <thelia>2.5.0</thelia>
     <stability>beta</stability>
 </module>

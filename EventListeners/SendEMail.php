@@ -24,14 +24,15 @@
 namespace DeliveryRound\EventListeners;
 
 use DeliveryRound\DeliveryRound;
+use Exception;
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Action\BaseAction;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Mailer\MailerFactory;
-use Thelia\Core\Template\ParserInterface;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\MessageQuery;
+use Thelia\Model\OrderStatusQuery;
 
 /**
  * Class SendEMail
@@ -41,68 +42,43 @@ use Thelia\Model\MessageQuery;
 class SendEMail extends BaseAction implements EventSubscriberInterface
 {
     /**
-     * @var MailerFactory
+     * @throws PropelException
+     * @throws Exception
      */
-    protected $mailer;
-    /**
-     * @var ParserInterface
-     */
-    protected $parser;
-
-    public function __construct(ParserInterface $parser, MailerFactory $mailer)
-    {
-        $this->parser = $parser;
-        $this->mailer = $mailer;
-    }
-
-    /**
-     * @return \Thelia\Mailer\MailerFactory
-     */
-    public function getMailer()
-    {
-        return $this->mailer;
-    }
-
-    /*
-     * @params OrderEvent $order
-     * Checks if order delivery module is DeliveryRound and if order new status is sent, send an email to the customer.
-     */
-    public function update_status(OrderEvent $event)
+    public function update_status(OrderEvent $event, MailerFactory $mailer): void
     {
         if ($event->getOrder()->getDeliveryModuleId() === DeliveryRound::getModuleId()) {
-            if ($event->getOrder()->getStatusId() === DeliveryRound::STATUS_SENT) {
-                $contact_email = ConfigQuery::read('store_email');
+            $targetStatusId = OrderStatusQuery::create()
+                ->filterById(4)
+                ->findOne()
+                ?->getId();
 
-                if ($contact_email) {
-                    $message = MessageQuery::create()
-                        ->filterByName('order_confirmation_deliveryround')
-                        ->findOne();
+            if ($event->getOrder()->getStatusId() === $targetStatusId) {
+                $order = $event->getOrder();
 
-                    if (false === $message) {
-                        throw new \Exception("Failed to load message 'order_confirmation_deliveryround'.");
-                    }
+                $contact_email = ConfigQuery::read('store_email', false);
+                $store_name = ConfigQuery::read('store_name');
 
-                    $order = $event->getOrder();
-                    $customer = $order->getCustomer();
-
-                    $this->parser->assign('order_id', $order->getId());
-                    $this->parser->assign('order_ref', $order->getRef());
-                    $this->parser->assign('order_date', $order->getCreatedAt());
-                    $this->parser->assign('update_date', $order->getUpdatedAt());
-
-                    $message
-                        ->setLocale($order->getLang()->getLocale());
-
-                    $instance = \Swift_Message::newInstance()
-                        ->addTo($customer->getEmail(), $customer->getFirstname()." ".$customer->getLastname())
-                        ->addFrom($contact_email, ConfigQuery::read('store_name'))
-                    ;
-
-                    // Build subject and body
-                    $message->buildMessage($this->parser, $instance);
-
-                    $this->getMailer()->send($instance);
+                if (!$contact_email || !$store_name) {
+                    throw new Exception("Store email or store name is not configured in the settings.");
                 }
+
+                $customer = $order->getCustomer();
+
+                $messageParameters = [
+                    "order_id" => $order->getId(),
+                    "order_ref" => $order->getRef(),
+                    "order_date" => $order->getCreatedAt(),
+                    "update_date" => $order->getUpdatedAt()
+                ];
+
+                $mailer->sendEmailMessage(
+                    'order_confirmation_deliveryround',
+                    [$contact_email => $store_name],
+                    [$customer->getEmail() => $customer->getFirstname() . " " . $customer->getLastname()],
+                    $messageParameters,
+                    $order->getLang()->getLocale()
+                );
             }
         }
     }
@@ -127,7 +103,7 @@ class SendEMail extends BaseAction implements EventSubscriberInterface
      *
      * @api
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return array(
             TheliaEvents::ORDER_UPDATE_STATUS => array("update_status", 128)

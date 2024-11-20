@@ -3,6 +3,8 @@
 namespace DeliveryRound\Form;
 
 use DeliveryRound\DeliveryRound;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Symfony\Component\Validator\Constraints;
 
@@ -13,23 +15,26 @@ use Symfony\Component\Validator\Constraints;
  */
 class DeliveryRoundConfigForm extends BaseForm
 {
-    protected function buildForm()
+    /**
+     * @return void
+     */
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(
                 'price',
-                'number',
+                NumberType::class,
                 [
                     'constraints' => [new Constraints\NotBlank()],
                     'required' => true,
-                    'label' => $this->translator->trans('Price', [], DeliveryRound::DOMAIN_NAME),
+                    'label' => Translator::getInstance()->trans('Price', [], DeliveryRound::DOMAIN_NAME),
                     'label_attr' => ['for' => 'price'],
                     'data' => DeliveryRound::getConfigValue('price', 0)
                 ]
             );
     }
 
-    public function getName()
+    public static function getName(): string
     {
         return 'deliveryround_config_form';
     }

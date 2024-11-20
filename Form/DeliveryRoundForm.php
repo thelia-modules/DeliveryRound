@@ -4,6 +4,9 @@ namespace DeliveryRound\Form;
 
 use DeliveryRound\DeliveryRound;
 use DeliveryRound\Model\Map\DeliveryRoundTableMap;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\BaseForm;
 use Symfony\Component\Validator\Constraints;
 
@@ -14,55 +17,58 @@ use Symfony\Component\Validator\Constraints;
  */
 class DeliveryRoundForm extends BaseForm
 {
-    protected function buildForm()
+    /**
+     * @return void
+     */
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(
                 'zipcode',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [new Constraints\NotBlank()],
                     'required' => true,
-                    'label' => $this->translator->trans('ZipCode', [], DeliveryRound::DOMAIN_NAME),
+                    'label' => Translator::getInstance()->trans('ZipCode', [], DeliveryRound::DOMAIN_NAME),
                     'label_attr' => ['for' => 'delivery-round-zipcode'],
                 ]
             )
             ->add(
                 'city',
-                'text',
+                TextType::class,
                 [
                     'constraints' => [new Constraints\NotBlank()],
                     'required' => true,
-                    'label' => $this->translator->trans('City', [], DeliveryRound::DOMAIN_NAME),
+                    'label' => Translator::getInstance()->trans('City', [], DeliveryRound::DOMAIN_NAME),
                     'label_attr' => ['for' => 'delivery-round-city'],
                 ]
             )
             ->add(
                 'address',
-                'text',
+                TextType::class,
                 [
                     'required' => false,
-                    'label' => $this->translator->trans('Address', [], DeliveryRound::DOMAIN_NAME),
+                    'label' => Translator::getInstance()->trans('Address', [], DeliveryRound::DOMAIN_NAME),
                     'label_attr' => ['for' => 'delivery-round-address'],
                 ]
             )
             ->add(
                 'day',
-                'choice',
+                ChoiceType::class,
                 [
                     'choices' => DeliveryRoundTableMap::getValueSet(DeliveryRoundTableMap::DAY),
                     'constraints' => [new Constraints\NotBlank()],
                     'required' => true,
-                    'label' => $this->translator->trans('Day', [], DeliveryRound::DOMAIN_NAME),
+                    'label' => Translator::getInstance()->trans('Day', [], DeliveryRound::DOMAIN_NAME),
                     'label_attr' => ['for' => 'delivery-round-day'],
                 ]
             )
             ->add(
                 'delivery_period',
-                'text',
+                TextType::class,
                 [
                     'required' => false,
-                    'label' => $this->translator->trans('Delivery period', [], DeliveryRound::DOMAIN_NAME),
+                    'label' => Translator::getInstance()->trans('Delivery period', [], DeliveryRound::DOMAIN_NAME),
                     'label_attr' => [
                         'for' => 'delivery-round-delivery_period'
                     ],
@@ -70,7 +76,7 @@ class DeliveryRoundForm extends BaseForm
             );
     }
 
-    public function getName()
+    public static function getName(): string
     {
         return 'deliveryround_form';
     }

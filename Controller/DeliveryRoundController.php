@@ -3,13 +3,20 @@
 namespace DeliveryRound\Controller;
 
 use DeliveryRound\DeliveryRound;
+use DeliveryRound\Form\DeliveryRoundConfigForm;
+use DeliveryRound\Form\DeliveryRoundDeleteForm;
+use DeliveryRound\Form\DeliveryRoundForm;
+use DeliveryRound\Form\DeliveryRoundUpdateForm;
 use DeliveryRound\Model\DeliveryRound as DeliveryRoundModel;
 use DeliveryRound\Model\DeliveryRoundQuery;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Propel;
+use Symfony\Component\Routing\Attribute\Route;
 use Thelia\Controller\Admin\BaseAdminController;
+use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
+use Thelia\Core\Translation\Translator;
 use Thelia\Form\Exception\FormValidationException;
 
 /**
@@ -20,15 +27,16 @@ use Thelia\Form\Exception\FormValidationException;
 class DeliveryRoundController extends BaseAdminController
 {
     /**
-     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @return mixed|Response
      */
-    public function configureAction()
+    #[Route('/admin/module/DeliveryRound/config', name: 'deliveryround_config')]
+    public function configureAction(): mixed
     {
         if (null !== $response = $this->checkAuth([AdminResources::MODULE], ["DeliveryRound"], AccessManager::CREATE)) {
             return $response;
         }
 
-        $form = $this->createForm('deliveryround_config_form');
+        $form = $this->createForm(DeliveryRoundConfigForm::getName());
         $error = null;
         $ex = null;
 
@@ -45,7 +53,7 @@ class DeliveryRoundController extends BaseAdminController
 
         if ($error !== null) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("DeliveryRound configuration", [], DeliveryRound::DOMAIN_NAME),
+                Translator::getInstance()->trans("DeliveryRound configuration", [], DeliveryRound::DOMAIN_NAME),
                 $error,
                 $form,
                 $ex
@@ -56,15 +64,16 @@ class DeliveryRoundController extends BaseAdminController
     }
 
     /**
-     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @return mixed|Response
      */
-    public function addLocationAction()
+    #[Route('/admin/module/DeliveryRound/addLocation', name: 'deliveryround_addlocation')]
+    public function addLocationAction(): mixed
     {
         if (null !== $response = $this->checkAuth([AdminResources::MODULE], ["DeliveryRound"], AccessManager::CREATE)) {
             return $response;
         }
 
-        $form = $this->createForm('deliveryround_form');
+        $form = $this->createForm(DeliveryRoundForm::getName());
         $error = null;
         $ex = null;
 
@@ -79,6 +88,7 @@ class DeliveryRoundController extends BaseAdminController
                 ->setDay($vForm->get('day')->getData())
                 ->setDeliveryPeriod($vForm->get('delivery_period')->getData())
                 ->save();
+
         } catch (FormValidationException $ex) {
             $error = $this->createStandardFormValidationErrorMessage($ex);
         } catch (\Exception $ex) {
@@ -87,7 +97,7 @@ class DeliveryRoundController extends BaseAdminController
 
         if ($error !== null) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("DeliveryRound configuration", [], DeliveryRound::DOMAIN_NAME),
+                Translator::getInstance()->trans("DeliveryRound configuration", [], DeliveryRound::DOMAIN_NAME),
                 $error,
                 $form,
                 $ex
@@ -98,15 +108,16 @@ class DeliveryRoundController extends BaseAdminController
     }
 
     /**
-     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @return mixed|Response
      */
-    public function deleteAction()
+    #[Route('/admin/module/DeliveryRound/delete', name: 'deliveryround_delete')]
+    public function deleteAction(): mixed
     {
         if (null !== $response = $this->checkAuth([AdminResources::MODULE], ["DeliveryRound"], AccessManager::DELETE)) {
             return $response;
         }
 
-        $form = $this->createForm('deliveryround_delete_form');
+        $form = $this->createForm(DeliveryRoundDeleteForm::getName());
         $error = null;
         $ex = null;
 
@@ -123,7 +134,7 @@ class DeliveryRoundController extends BaseAdminController
 
         if ($error !== null) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("DeliveryRound configuration", [], DeliveryRound::DOMAIN_NAME),
+                Translator::getInstance()->trans("DeliveryRound configuration", [], DeliveryRound::DOMAIN_NAME),
                 $error,
                 $form,
                 $ex
@@ -134,9 +145,10 @@ class DeliveryRoundController extends BaseAdminController
     }
 
     /**
-     * @return mixed|\Thelia\Core\HttpFoundation\Response
+     * @return mixed|Response
      */
-    public function updateAction()
+    #[Route('/admin/module/DeliveryRound/update', name: 'deliveryround_update')]
+    public function updateAction(): mixed
     {
         if (null !== $response = $this->checkAuth([AdminResources::MODULE], ["DeliveryRound"], AccessManager::UPDATE)) {
             return $response;
@@ -145,7 +157,7 @@ class DeliveryRoundController extends BaseAdminController
         $con = Propel::getConnection();
         $con->beginTransaction();
 
-        $form = $this->createForm('deliveryround_update_form');
+        $form = $this->createForm(DeliveryRoundUpdateForm::getName());
         $error = null;
         $ex = null;
 
@@ -154,9 +166,8 @@ class DeliveryRoundController extends BaseAdminController
             $data = $vForm->getData();
 
             $model = DeliveryRoundQuery::create()->findOneById($data['id']);
-
-            $model->fromArray($data, TableMap::TYPE_FIELDNAME);
-            $model->save();
+            $model?->fromArray($data, TableMap::TYPE_FIELDNAME);
+            $model?->save();
 
             $con->commit();
         } catch (FormValidationException $ex) {
@@ -169,7 +180,7 @@ class DeliveryRoundController extends BaseAdminController
 
         if ($error !== null) {
             $this->setupFormErrorContext(
-                $this->getTranslator()->trans("DeliveryRound configuration", [], DeliveryRound::DOMAIN_NAME),
+                Translator::getInstance()->trans("DeliveryRound configuration", [], DeliveryRound::DOMAIN_NAME),
                 $error,
                 $form,
                 $ex
