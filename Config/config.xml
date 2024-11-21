@@ -4,10 +4,6 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
-    <loops>
-        <loop name="deliveryround" class="DeliveryRound\Loop\DeliveryRoundLoop" />
-    </loops>
-
     <forms>
         <form name="deliveryround_config_form" class="DeliveryRound\Form\DeliveryRoundConfigForm" />
         <form name="deliveryround_form" class="DeliveryRound\Form\DeliveryRoundForm" />
@@ -22,13 +18,4 @@
             <tag name="hook.event_listener" event="order-delivery.extra" type="front" method="onOrderDeliveryExtra"/>
         </hook>
     </hooks>
-
-    <services>
-        <service id="send.deliveryround.mail" class="DeliveryRound\EventListeners\SendEMail" scope="request">
-            <argument type="service" id="thelia.parser" />
-            <argument type="service" id="mailer"/>
-            <tag name="kernel.event_subscriber"/>
-        </service>
-    </services>
-
 </config>

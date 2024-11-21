@@ -14,6 +14,8 @@ namespace DeliveryRound;
 
 use DeliveryRound\Model\DeliveryRoundQuery;
 use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
 use Thelia\Core\Translation\Translator;
 use Thelia\Install\Database;
 use Thelia\Model\AddressQuery;
@@ -31,13 +33,13 @@ class DeliveryRound extends AbstractDeliveryModule
     /**
      * @param ConnectionInterface|null $con
      */
-    public function postActivation(ConnectionInterface $con = null)
+    public function postActivation(ConnectionInterface $con = null): void
     {
-        $database = new Database($con->getWrappedConnection());
+        $database = new Database($con?->getWrappedConnection());
 
-        $database->insertSql(null, array(__DIR__ . '/Config/insert.sql'));
+        $database->insertSql(null, array(__DIR__ . '/Config/TheliaMain.sql'));
 
-        DeliveryRound::setConfigValue('price', 0);
+        self::setConfigValue('price', 0);
     }
 
     /**
@@ -50,14 +52,15 @@ class DeliveryRound extends AbstractDeliveryModule
      * @param Country $country the country to deliver to.
      *
      * @return boolean
+     * @throws PropelException
      */
-    public function isValidDelivery(Country $country)
+    public function isValidDelivery(Country $country): bool
     {
         // Get current addressId
         $currentAddressId = $this->getRequest()->request->get('address_id');
 
         if (empty($currentAddressId)) {
-            if (null !== $customer = $this->getRequest()->getSession()->getCustomerUser()) {
+            if (null !== $customer = $this->getRequest()->getSession()?->getCustomerUser()) {
                 $currentAddressId = AddressQuery::create()
                     ->filterByCustomer($customer)
                     ->filterByIsDefault(1)
@@ -72,30 +75,13 @@ class DeliveryRound extends AbstractDeliveryModule
         $deliveryRounds = DeliveryRoundQuery::create()->find();
         $deliveryRoundZipcode = [];
 
-        /** @var \DeliveryRound\Model\DeliveryRound $deliveryRound */
+        /** @var Model\DeliveryRound $deliveryRound */
         foreach ($deliveryRounds as $deliveryRound) {
             $deliveryRoundZipcode[] = $deliveryRound->getZipCode();
         }
 
         // Check if the customer's current address is in delivered zipcodes
-        if (null !== AddressQuery::create()->filterByZipcode($deliveryRoundZipcode)->findOneById($currentAddressId)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * @param $request
-     * @return mixed
-     * @throws \Propel\Runtime\Exception\PropelException
-     */
-    protected function getCurrentlySelectedAddress($request)
-    {
-
-
-
-        return $currentAddressId;
+        return null !== AddressQuery::create()->filterByZipcode($deliveryRoundZipcode)->findOneById($currentAddressId);
     }
 
     /**
@@ -105,8 +91,9 @@ class DeliveryRound extends AbstractDeliveryModule
      *
      * @return OrderPostage|float             the delivery price
      * @throws DeliveryException if the postage price cannot be calculated.
+     * @throws PropelException
      */
-    public function getPostage(Country $country)
+    public function getPostage(Country $country): float|OrderPostage
     {
         if (! $this->isValidDelivery($country)) {
             throw new DeliveryException(
@@ -114,6 +101,18 @@ class DeliveryRound extends AbstractDeliveryModule
             );
         }
 
-        return $this->getConfigValue('price', 0);
+        return self::getConfigValue('price', 0);
+    }
+
+    /**
+     * @param ServicesConfigurator $servicesConfigurator
+     * @return void
+     */
+    public static function configureServices(ServicesConfigurator $servicesConfigurator): void
+    {
+        $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
+            ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"])
+            ->autowire(true)
+            ->autoconfigure(true);
     }
 }

@@ -1,7 +1,7 @@
 <tr>
     <td>
         <ul>
-            {loop type='deliveryround' name='deliveryround-loop'}
+            {loop type='delivery_round_loop' name='delivery_round_loop'}
                 <li>{$DAY|date_format:"%A"} : {$ZIPCODE} {$CITY}{if $ADDRESS}, {$ADDRESS}{/if}{if $DELIVERY_PERIOD}, {$DELIVERY_PERIOD}{/if}</li>
             {/loop}
         </ul>

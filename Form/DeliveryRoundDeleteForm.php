@@ -2,6 +2,7 @@
 
 namespace DeliveryRound\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Thelia\Form\BaseForm;
 use Symfony\Component\Validator\Constraints;
 
@@ -12,12 +13,12 @@ use Symfony\Component\Validator\Constraints;
  */
 class DeliveryRoundDeleteForm extends BaseForm
 {
-    protected function buildForm()
+    protected function buildForm(): void
     {
         $this->formBuilder
             ->add(
                 'id',
-                'integer',
+                IntegerType::class,
                 [
                     'constraints' => [new Constraints\NotBlank()],
                     'required' => true,
@@ -25,7 +26,7 @@ class DeliveryRoundDeleteForm extends BaseForm
             );
     }
 
-    public function getName()
+    public static function getName(): string
     {
         return 'deliveryround_delete_form';
     }
