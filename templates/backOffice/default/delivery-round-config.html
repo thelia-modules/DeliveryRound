@@ -95,7 +95,7 @@
                                 {$label} {if $required}*{/if}
                                 {form_error form=$form field="day"}
                                     <br/>
-                                    <span class="error">{$message}</span>
+                                    <span class="error">{$message|default:null}</span>
                                 {/form_error}
                             </label>
 
@@ -117,7 +117,7 @@
                             </label>
 
                             <input type="text" id="{$label_attr.for}" class="form-control" name="{$name}"
-                                   {if $required}required{/if} placeholder="{$label_attr.placeholder}"/>
+                                   {if $required}required{/if} placeholder="{$label_attr.placeholder|default:null}"/>
                         </div>
                     {/form_field}
                 </div>
