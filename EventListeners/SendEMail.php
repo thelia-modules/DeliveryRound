@@ -41,11 +41,15 @@ use Thelia\Model\OrderStatusQuery;
  */
 class SendEMail extends BaseAction implements EventSubscriberInterface
 {
+    public function __construct(private readonly MailerFactory $mailerFactory)
+    {
+    }
+
     /**
      * @throws PropelException
      * @throws Exception
      */
-    public function update_status(OrderEvent $event, MailerFactory $mailer): void
+    public function update_status(OrderEvent $event): void
     {
         if ($event->getOrder()->getDeliveryModuleId() === DeliveryRound::getModuleId()) {
             $targetStatusId = OrderStatusQuery::create()
@@ -72,7 +76,7 @@ class SendEMail extends BaseAction implements EventSubscriberInterface
                     "update_date" => $order->getUpdatedAt()
                 ];
 
-                $mailer->sendEmailMessage(
+                $this->mailerFactory->sendEmailMessage(
                     'order_confirmation_deliveryround',
                     [$contact_email => $store_name],
                     [$customer->getEmail() => $customer->getFirstname() . " " . $customer->getLastname()],
