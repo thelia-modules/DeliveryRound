@@ -1,12 +1,29 @@
 <?php
 
-return array(
+return [
+    'Actions' => 'Actions',
+    'Add' => 'Ajouter',
     'Address' => 'Adresse',
     'City' => 'Ville',
     'Day' => 'Jour',
     'Delivery period' => 'Heures de livraison',
+    'Delivery rounds updated.' => 'Tournées de livraison mises à jour.',
     'DeliveryRound configuration' => 'Configuration de DeliveryRound',
+    'Friday' => 'Vendredi',
+    'Id' => 'Id',
+    'Monday' => 'Lundi',
+    'No delivery round yet.' => 'Aucune tournée de livraison pour le moment.',
     'Price' => 'Prix',
+    'Remove' => 'Supprimer',
+    'Saturday' => 'Samedi',
+    'Save' => 'Enregistrer',
+    'Sunday' => 'Dimanche',
+    'This delivery round does not exist.' => "Cette tournée de livraison n'existe pas.",
     'This module cannot be used on the current cart.' => 'Ce module ne peut être utilisé avec le panier actuel.',
+    'Thursday' => 'Jeudi',
+    'Tuesday' => 'Mardi',
+    'Wednesday' => 'Mercredi',
     'ZipCode' => 'Code postal',
-);
+    'configure delivery round price' => 'Configurer le prix des tournées de livraison',
+    'configure delivery rounds' => 'Configurer les tournées de livraison',
+];

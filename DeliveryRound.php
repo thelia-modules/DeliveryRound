@@ -16,8 +16,8 @@ use DeliveryRound\Model\DeliveryRoundQuery;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServicesConfigurator;
+use Thelia\Core\Install\Database;
 use Thelia\Core\Translation\Translator;
-use Thelia\Install\Database;
 use Thelia\Model\AddressQuery;
 use Thelia\Model\Country;
 use Thelia\Model\OrderPostage;
@@ -27,91 +27,81 @@ use Thelia\Module\Exception\DeliveryException;
 class DeliveryRound extends AbstractDeliveryModule
 {
     /** @var string */
-    const DOMAIN_NAME = 'deliveryround';
-    const STATUS_SENT = 'sent';
+    public const DOMAIN_NAME = 'deliveryround';
+    public const STATUS_SENT = 'sent';
 
     /**
-     * @param ConnectionInterface|null $con
+     * Creates the table only when it does not exist yet: (re)activating the module
+     * must never drop the delivery rounds already configured.
      */
-    public function postActivation(ConnectionInterface $con = null): void
+    public function postActivation(?ConnectionInterface $con = null): void
     {
-        $database = new Database($con?->getWrappedConnection());
+        $database = new Database($con);
+        $database->insertSql(null, [__DIR__.'/Config/insert.sql']);
 
-        $database->insertSql(null, array(__DIR__ . '/Config/TheliaMain.sql'));
-
-        self::setConfigValue('price', 0);
+        if (null === self::getConfigValue('price')) {
+            self::setConfigValue('price', 0);
+        }
     }
 
     /**
-     * This method is called by the Delivery  loop, to check if the current module has to be displayed to the customer.
-     * Override it to implements your delivery rules/
+     * Fallback used when the delivery address is not known by the caller. During the
+     * checkout, the address is provided by the DeliveryPostageEvent and handled by
+     * DeliveryRound\EventListeners\DeliveryPostageListener.
      *
-     * If you return true, the delivery method will de displayed to the customer
-     * If you return false, the delivery method will not be displayed
-     *
-     * @param Country $country the country to deliver to.
-     *
-     * @return boolean
      * @throws PropelException
      */
     public function isValidDelivery(Country $country): bool
     {
-        // Get current addressId
-        $currentAddressId = $this->getRequest()->request->get('address_id');
+        $request = $this->getRequest();
+        $currentAddressId = $request->request->get('address_id');
 
         if (empty($currentAddressId)) {
-            if (null !== $customer = $this->getRequest()->getSession()?->getCustomerUser()) {
-                $currentAddressId = AddressQuery::create()
-                    ->filterByCustomer($customer)
-                    ->filterByIsDefault(1)
-                    ->select('ID')
-                    ->findOne();
-            } else {
+            if (null === $customer = $request->getSession()?->getCustomerUser()) {
                 return false;
             }
+
+            $currentAddressId = AddressQuery::create()
+                ->filterByCustomer($customer)
+                ->filterByIsDefault(1)
+                ->select('ID')
+                ->findOne();
         }
 
-        // Get delivered zipcodes
-        $deliveryRounds = DeliveryRoundQuery::create()->find();
-        $deliveryRoundZipcode = [];
+        $address = null !== $currentAddressId ? AddressQuery::create()->findPk((int) $currentAddressId) : null;
 
-        /** @var Model\DeliveryRound $deliveryRound */
-        foreach ($deliveryRounds as $deliveryRound) {
-            $deliveryRoundZipcode[] = $deliveryRound->getZipCode();
-        }
-
-        // Check if the customer's current address is in delivered zipcodes
-        return null !== AddressQuery::create()->filterByZipcode($deliveryRoundZipcode)->findOneById($currentAddressId);
+        return null !== $address && self::isZipCodeDelivered((string) $address->getZipcode());
     }
 
     /**
-     * Calculate and return delivery price in the shop's default currency
-     *
-     * @param Country $country the country to deliver to.
-     *
-     * @return OrderPostage|float             the delivery price
-     * @throws DeliveryException if the postage price cannot be calculated.
+     * @throws DeliveryException if the cart cannot be delivered by a delivery round
      * @throws PropelException
      */
     public function getPostage(Country $country): float|OrderPostage
     {
-        if (! $this->isValidDelivery($country)) {
-            throw new DeliveryException(
-                Translator::getInstance()->trans("This module cannot be used on the current cart.")
-            );
+        if (!$this->isValidDelivery($country)) {
+            throw new DeliveryException(Translator::getInstance()->trans('This module cannot be used on the current cart.', [], self::DOMAIN_NAME));
         }
 
-        return self::getConfigValue('price', 0);
+        return self::getPrice();
     }
 
-    /**
-     * @param ServicesConfigurator $servicesConfigurator
-     * @return void
-     */
+    public static function getPrice(): float
+    {
+        return (float) self::getConfigValue('price', 0);
+    }
+
+    public static function isZipCodeDelivered(string $zipCode): bool
+    {
+        $zipCode = trim($zipCode);
+
+        return '' !== $zipCode && DeliveryRoundQuery::create()->filterByZipCode($zipCode)->exists();
+    }
+
     public static function configureServices(ServicesConfigurator $servicesConfigurator): void
     {
         $servicesConfigurator->load(self::getModuleCode().'\\', __DIR__)
-            ->exclude([THELIA_MODULE_DIR . ucfirst(self::getModuleCode()). "/I18n/*"])
+            ->exclude([__DIR__.'/I18n/*'])
             ->autowire(true)
             ->autoconfigure(true);
     }

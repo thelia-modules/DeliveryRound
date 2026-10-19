@@ -24,15 +24,14 @@
 namespace DeliveryRound\EventListeners;
 
 use DeliveryRound\DeliveryRound;
-use Exception;
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Action\BaseAction;
 use Thelia\Core\Event\Order\OrderEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Log\Tlog;
 use Thelia\Mailer\MailerFactory;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\OrderStatusQuery;
 
 /**
  * Class SendEMail
@@ -46,45 +45,45 @@ class SendEMail extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     * Sends the "order_confirmation_deliveryround" message when an order delivered by
+     * a delivery round switches to the "sent" status.
+     *
      * @throws PropelException
-     * @throws Exception
      */
     public function update_status(OrderEvent $event): void
     {
-        if ($event->getOrder()->getDeliveryModuleId() === DeliveryRound::getModuleId()) {
-            $targetStatusId = OrderStatusQuery::create()
-                ->filterById(4)
-                ->findOne()
-                ?->getId();
+        $order = $event->getOrder();
 
-            if ($event->getOrder()->getStatusId() === $targetStatusId) {
-                $order = $event->getOrder();
-
-                $contact_email = ConfigQuery::read('store_email', false);
-                $store_name = ConfigQuery::read('store_name');
-
-                if (!$contact_email || !$store_name) {
-                    throw new Exception("Store email or store name is not configured in the settings.");
-                }
-
-                $customer = $order->getCustomer();
-
-                $messageParameters = [
-                    "order_id" => $order->getId(),
-                    "order_ref" => $order->getRef(),
-                    "order_date" => $order->getCreatedAt(),
-                    "update_date" => $order->getUpdatedAt()
-                ];
-
-                $this->mailerFactory->sendEmailMessage(
-                    'order_confirmation_deliveryround',
-                    [$contact_email => $store_name],
-                    [$customer->getEmail() => $customer->getFirstname() . " " . $customer->getLastname()],
-                    $messageParameters,
-                    $order->getLang()->getLocale()
-                );
-            }
+        if ($order->getDeliveryModuleId() !== DeliveryRound::getModuleId() || !$order->isSent()) {
+            return;
         }
+
+        $contact_email = ConfigQuery::read('store_email', false);
+        $store_name = ConfigQuery::read('store_name');
+
+        if (!$contact_email || !$store_name) {
+            // Never block the order status update because of a missing store setting.
+            Tlog::getInstance()->addError('DeliveryRound: store email or store name is not configured, order '.$order->getRef().' notification not sent.');
+
+            return;
+        }
+
+        $customer = $order->getCustomer();
+
+        $messageParameters = [
+            "order_id" => $order->getId(),
+            "order_ref" => $order->getRef(),
+            "order_date" => $order->getCreatedAt(),
+            "update_date" => $order->getUpdatedAt()
+        ];
+
+        $this->mailerFactory->sendEmailMessage(
+            'order_confirmation_deliveryround',
+            [$contact_email => $store_name],
+            [$customer->getEmail() => $customer->getFirstname() . " " . $customer->getLastname()],
+            $messageParameters,
+            $order->getLang()->getLocale()
+        );
     }
 
     /**

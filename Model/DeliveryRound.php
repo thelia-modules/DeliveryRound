@@ -18,7 +18,7 @@ class DeliveryRound extends BaseDeliveryRound
     public function setDay($v): static
     {
         if ($v !== null && !is_numeric($v)) {
-            $valueSet = DeliveryRoundTableMap::getValueSet(DeliveryRoundTableMap::DAY);
+            $valueSet = DeliveryRoundTableMap::getValueSet(DeliveryRoundTableMap::COL_DAY);
             if (!in_array($v, $valueSet, true)) {
                 throw new PropelException(sprintf('Value "%s" is not accepted in this enumerated column', $v));
             }
@@ -27,7 +27,7 @@ class DeliveryRound extends BaseDeliveryRound
 
         if ($this->day !== $v) {
             $this->day = $v;
-            $this->modifiedColumns[DeliveryRoundTableMap::DAY] = true;
+            $this->modifiedColumns[DeliveryRoundTableMap::COL_DAY] = true;
         }
 
         return $this;
