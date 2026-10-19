@@ -5,6 +5,7 @@ namespace DeliveryRound\Loop;
 use DeliveryRound\Model\DeliveryRoundQuery;
 use DeliveryRound\Model\Map\DeliveryRoundTableMap;
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -24,13 +25,13 @@ class DeliveryRoundLoop extends BaseLoop implements PropelSearchLoopInterface
      *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
-    protected function getArgDefinitions()
+    protected function getArgDefinitions(): ArgumentCollection
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createAnyListTypeArgument('zipcode'),
             Argument::createAnyListTypeArgument('city'),
-            Argument::createEnumListTypeArgument('day', DeliveryRoundTableMap::getValueSet(DeliveryRoundTableMap::DAY)),
+            Argument::createEnumListTypeArgument('day', DeliveryRoundTableMap::getValueSet(DeliveryRoundTableMap::COL_DAY)),
             Argument::createEnumListTypeArgument('order', [
                 'day',
                 'day-reverse',
@@ -47,7 +48,7 @@ class DeliveryRoundLoop extends BaseLoop implements PropelSearchLoopInterface
      *
      * @return \Propel\Runtime\ActiveQuery\ModelCriteria
      */
-    public function buildModelCriteria()
+    public function buildModelCriteria(): ModelCriteria
     {
         $search = DeliveryRoundQuery::create();
 
@@ -97,7 +98,7 @@ class DeliveryRoundLoop extends BaseLoop implements PropelSearchLoopInterface
      *
      * @return LoopResult
      */
-    public function parseResults(LoopResult $loopResult)
+    public function parseResults(LoopResult $loopResult): LoopResult
     {
         /** @var \DeliveryRound\Model\DeliveryRound $deliveryRound */
         foreach ($loopResult->getResultDataCollection() as $deliveryRound) {

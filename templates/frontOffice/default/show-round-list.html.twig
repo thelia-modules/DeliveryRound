@@ -1,0 +1,9 @@
+{% if rounds|length > 0 %}
+    <ul class="delivery-round-list">
+        {% for round in rounds %}
+            <li>
+                {{ round.day|capitalize|trans({}, 'deliveryround') }} : {{ round.zipCode }} {{ round.city }}{% if round.address %}, {{ round.address }}{% endif %}{% if round.deliveryPeriod %}, {{ round.deliveryPeriod }}{% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

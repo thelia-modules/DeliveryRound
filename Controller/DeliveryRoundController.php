@@ -9,15 +9,16 @@ use DeliveryRound\Form\DeliveryRoundForm;
 use DeliveryRound\Form\DeliveryRoundUpdateForm;
 use DeliveryRound\Model\DeliveryRound as DeliveryRoundModel;
 use DeliveryRound\Model\DeliveryRoundQuery;
-use Propel\Runtime\Map\TableMap;
-use Propel\Runtime\Propel;
+use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Thelia\Controller\Admin\BaseAdminController;
-use Thelia\Core\HttpFoundation\Response;
 use Thelia\Core\Security\AccessManager;
 use Thelia\Core\Security\Resource\AdminResources;
 use Thelia\Core\Translation\Translator;
 use Thelia\Form\Exception\FormValidationException;
+use Thelia\Tools\URL;
 
 /**
  * Class DeliveryRoundController
@@ -26,167 +27,77 @@ use Thelia\Form\Exception\FormValidationException;
  */
 class DeliveryRoundController extends BaseAdminController
 {
-    /**
-     * @return mixed|Response
-     */
-    #[Route('/admin/module/DeliveryRound/config', name: 'deliveryround_config')]
-    public function configureAction(): mixed
+    #[Route('/admin/module/DeliveryRound/config', name: 'deliveryround_config', methods: ['POST'])]
+    public function configureAction(Request $request): Response
     {
-        if (null !== $response = $this->checkAuth([AdminResources::MODULE], ["DeliveryRound"], AccessManager::CREATE)) {
-            return $response;
-        }
+        return $this->handle($request, DeliveryRoundConfigForm::getName(), AccessManager::UPDATE, static function (Form $form): void {
+            DeliveryRound::setConfigValue('price', $form->get('price')->getData());
+        });
+    }
 
-        $form = $this->createForm(DeliveryRoundConfigForm::getName());
-        $error = null;
-        $ex = null;
+    #[Route('/admin/module/DeliveryRound/addLocation', name: 'deliveryround_addlocation', methods: ['POST'])]
+    public function addLocationAction(Request $request): Response
+    {
+        return $this->handle($request, DeliveryRoundForm::getName(), AccessManager::CREATE, function (Form $form): void {
+            $this->hydrate(new DeliveryRoundModel(), $form)->save();
+        });
+    }
 
-        try {
-            $vForm = $this->validateForm($form);
+    #[Route('/admin/module/DeliveryRound/update', name: 'deliveryround_update', methods: ['POST'])]
+    public function updateAction(Request $request): Response
+    {
+        return $this->handle($request, DeliveryRoundUpdateForm::getName(), AccessManager::UPDATE, function (Form $form): void {
+            if (null === $deliveryRound = DeliveryRoundQuery::create()->findPk((int) $form->get('id')->getData())) {
+                throw new \RuntimeException(Translator::getInstance()->trans('This delivery round does not exist.', [], DeliveryRound::DOMAIN_NAME));
+            }
 
-            // Configure price
-            DeliveryRound::setConfigValue('price', $vForm->get('price')->getData());
-        } catch (FormValidationException $ex) {
-            $error = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
-            $error = $ex->getMessage();
-        }
+            $this->hydrate($deliveryRound, $form)->save();
+        });
+    }
 
-        if ($error !== null) {
-            $this->setupFormErrorContext(
-                Translator::getInstance()->trans("DeliveryRound configuration", [], DeliveryRound::DOMAIN_NAME),
-                $error,
-                $form,
-                $ex
-            );
-        }
-
-        return $this->render('module-configure', array('module_code' => 'DeliveryRound'));
+    #[Route('/admin/module/DeliveryRound/delete', name: 'deliveryround_delete', methods: ['POST'])]
+    public function deleteAction(Request $request): Response
+    {
+        return $this->handle($request, DeliveryRoundDeleteForm::getName(), AccessManager::DELETE, static function (Form $form): void {
+            DeliveryRoundQuery::create()->filterById((int) $form->get('id')->getData())->delete();
+        });
     }
 
     /**
-     * @return mixed|Response
+     * Checks the access, validates the form, runs the action and always redirects back to the
+     * module configuration page, with a flash message telling what happened.
+     *
+     * @param callable(Form): void $action
      */
-    #[Route('/admin/module/DeliveryRound/addLocation', name: 'deliveryround_addlocation')]
-    public function addLocationAction(): mixed
+    private function handle(Request $request, string $formName, string $access, callable $action): Response
     {
-        if (null !== $response = $this->checkAuth([AdminResources::MODULE], ["DeliveryRound"], AccessManager::CREATE)) {
+        if (null !== $response = $this->checkAuth([AdminResources::MODULE], ['DeliveryRound'], $access)) {
             return $response;
         }
 
-        $form = $this->createForm(DeliveryRoundForm::getName());
-        $error = null;
-        $ex = null;
+        $translator = Translator::getInstance();
+        $form = $this->createForm($formName);
 
         try {
-            $vForm = $this->validateForm($form);
+            $action($this->validateForm($form, 'POST'));
 
-            // Create new entry
-            (new DeliveryRoundModel())
-                ->setZipCode($vForm->get('zipcode')->getData())
-                ->setCity($vForm->get('city')->getData())
-                ->setAddress($vForm->get('address')->getData())
-                ->setDay($vForm->get('day')->getData())
-                ->setDeliveryPeriod($vForm->get('delivery_period')->getData())
-                ->save();
-
+            $request->getSession()->getFlashBag()->add('success', $translator->trans('Delivery rounds updated.', [], DeliveryRound::DOMAIN_NAME));
         } catch (FormValidationException $ex) {
-            $error = $this->createStandardFormValidationErrorMessage($ex);
+            $request->getSession()->getFlashBag()->add('danger', $this->createStandardFormValidationErrorMessage($ex));
         } catch (\Exception $ex) {
-            $error = $ex->getMessage();
+            $request->getSession()->getFlashBag()->add('danger', $ex->getMessage());
         }
 
-        if ($error !== null) {
-            $this->setupFormErrorContext(
-                Translator::getInstance()->trans("DeliveryRound configuration", [], DeliveryRound::DOMAIN_NAME),
-                $error,
-                $form,
-                $ex
-            );
-        }
-
-        return $this->render('module-configure', array('module_code' => 'DeliveryRound'));
+        return $this->generateRedirect(URL::getInstance()->absoluteUrl('/admin/module/DeliveryRound'));
     }
 
-    /**
-     * @return mixed|Response
-     */
-    #[Route('/admin/module/DeliveryRound/delete', name: 'deliveryround_delete')]
-    public function deleteAction(): mixed
+    private function hydrate(DeliveryRoundModel $deliveryRound, Form $form): DeliveryRoundModel
     {
-        if (null !== $response = $this->checkAuth([AdminResources::MODULE], ["DeliveryRound"], AccessManager::DELETE)) {
-            return $response;
-        }
-
-        $form = $this->createForm(DeliveryRoundDeleteForm::getName());
-        $error = null;
-        $ex = null;
-
-        try {
-            $vForm = $this->validateForm($form);
-
-            // Remove entry
-            DeliveryRoundQuery::create()->filterById($vForm->get('id')->getData())->delete();
-        } catch (FormValidationException $ex) {
-            $error = $this->createStandardFormValidationErrorMessage($ex);
-        } catch (\Exception $ex) {
-            $error = $ex->getMessage();
-        }
-
-        if ($error !== null) {
-            $this->setupFormErrorContext(
-                Translator::getInstance()->trans("DeliveryRound configuration", [], DeliveryRound::DOMAIN_NAME),
-                $error,
-                $form,
-                $ex
-            );
-        }
-
-        return $this->render('module-configure', array('module_code' => 'DeliveryRound'));
-    }
-
-    /**
-     * @return mixed|Response
-     */
-    #[Route('/admin/module/DeliveryRound/update', name: 'deliveryround_update')]
-    public function updateAction(): mixed
-    {
-        if (null !== $response = $this->checkAuth([AdminResources::MODULE], ["DeliveryRound"], AccessManager::UPDATE)) {
-            return $response;
-        }
-
-        $con = Propel::getConnection();
-        $con->beginTransaction();
-
-        $form = $this->createForm(DeliveryRoundUpdateForm::getName());
-        $error = null;
-        $ex = null;
-
-        try {
-            $vForm = $this->validateForm($form);
-            $data = $vForm->getData();
-
-            $model = DeliveryRoundQuery::create()->findOneById($data['id']);
-            $model?->fromArray($data, TableMap::TYPE_FIELDNAME);
-            $model?->save();
-
-            $con->commit();
-        } catch (FormValidationException $ex) {
-            $error = $this->createStandardFormValidationErrorMessage($ex);
-            $con->rollBack();
-        } catch (\Exception $ex) {
-            $error = $ex->getMessage();
-            $con->rollBack();
-        }
-
-        if ($error !== null) {
-            $this->setupFormErrorContext(
-                Translator::getInstance()->trans("DeliveryRound configuration", [], DeliveryRound::DOMAIN_NAME),
-                $error,
-                $form,
-                $ex
-            );
-        }
-
-        return $this->render('module-configure', array('module_code' => 'DeliveryRound'));
+        return $deliveryRound
+            ->setZipCode(trim((string) $form->get('zipcode')->getData()))
+            ->setCity((string) $form->get('city')->getData())
+            ->setAddress($form->get('address')->getData())
+            ->setDay($form->get('day')->getData())
+            ->setDeliveryPeriod($form->get('delivery_period')->getData());
     }
 }

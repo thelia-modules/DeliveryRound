@@ -56,7 +56,11 @@ class DeliveryRoundForm extends BaseForm
                 'day',
                 ChoiceType::class,
                 [
-                    'choices' => DeliveryRoundTableMap::getValueSet(DeliveryRoundTableMap::DAY),
+                    'choices' => array_combine(
+                        DeliveryRoundTableMap::getValueSet(DeliveryRoundTableMap::COL_DAY),
+                        DeliveryRoundTableMap::getValueSet(DeliveryRoundTableMap::COL_DAY)
+                    ),
+                    'choice_label' => static fn (string $day): string => Translator::getInstance()->trans(ucfirst($day), [], DeliveryRound::DOMAIN_NAME),
                     'constraints' => [new Constraints\NotBlank()],
                     'required' => true,
                     'label' => Translator::getInstance()->trans('Day', [], DeliveryRound::DOMAIN_NAME),
